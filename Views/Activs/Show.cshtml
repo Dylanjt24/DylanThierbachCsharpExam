@@ -1,0 +1,41 @@
+@model Activ
+
+<div class="container">
+    <div class="row justify-content-between align-items-center">
+        <h1 class="mb-4">@Model.Title</h1>
+        @if (@Model.UserId == Context.Session.GetInt32("Uid"))
+        {
+            <form asp-controller="Activs" asp-action="Delete" asp-route-activId="@Model.ActivId" method="post">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+        }
+        else
+        {
+            bool isParticipating = @Model.ActivParticipants
+            .Any(activ => activ.UserId == Context.Session.GetInt32("Uid"));
+
+            <form asp-controller="Activs" asp-action="Participate" asp-route-activId="@Model.ActivId">
+                @if (isParticipating)
+                {
+                    <button class="btn btn-primary">Leave</button>
+                }
+                else
+                {
+                    <button class="btn btn-success">Join</button>
+                }
+            </form>
+        }
+    </div>
+    <div class="ml-5">
+        <p><strong>Event Coordinator:</strong> <span class="ml-4">@Model.Creator.Name</span></p>
+        <p class="mt-2"><strong>Description:</strong></p>
+        <p class="ml-4">@Model.Description</p>
+        <p class=" mt-5"><strong>Participants:</strong></p>
+        <ul class=" list-unstyled ml-5">
+            @foreach (Participant participant in Model.ActivParticipants)
+            {
+                <li>@participant.User.Name</li>
+            }
+        </ul>
+    </div>
+</div>

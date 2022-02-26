@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model Participant
+
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Activity</th>
+                <th>Date and Time</th>
+                <th>Duration</th>
+                <th>Event Coordinator</th>
+                <th>No. of Participants</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Activ activ in ViewBag.AllActivs)
+            {
+                bool isParticipating = activ.ActivParticipants
+                .Any(activ => activ.UserId == Context.Session.GetInt32("Uid"));
+
+                <tr>
+                    <td><a asp-controller="Activs" asp-action="Show" asp-route-activId="@activ.ActivId">@activ.Title</a></td>
+                    <td>@activ.Date.ToString("M/d") @@ @activ.Time.ToString("h:mmtt")</td>
+                    <td>@activ.Duration @activ.DurationType</td>
+                    <td>@activ.Creator.Name</td>
+                    <td>@activ.ActivParticipants.Count</td>
+                    <td>
+                        @if (@activ.UserId == Context.Session.GetInt32("Uid"))
+                        {
+                            <form asp-controller="Activs" asp-action="Delete" asp-route-activId="@activ.ActivId" method="post">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Activs" asp-action="Participate" asp-route-activId="@activ.ActivId">
+                                @if (isParticipating)
+                                {
+                                    <button class="btn btn-primary">Leave</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-success">Join</button>
+                                }
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-controller="Activs" asp-action="New" class="btn btn-outline-primary">Add New Activity</a>
+</div>
